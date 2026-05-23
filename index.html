@@ -546,10 +546,16 @@ textarea.finput{resize:none;height:66px;}
 // ══════════════════════════════════════════════
 const SUPABASE_URL = 'https://wpnicrffddfnufyiouvl.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_RUz2ciNa9oKv3bfs4kc2MA_vgdjeqZo';
-const ADMIN_EMAIL  = 'Thiagoalerhandro20@gmail.com'; // <- coloca seu email aqui
+const ADMIN_EMAIL  = 'Thiagoalerhandro20@gmail.com';
+const ADMIN_SENHA  = '2878440278';
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Acesso admin por URL secreta
+const _urlP = new URLSearchParams(window.location.search);
+if (_urlP.get('admin') === ADMIN_SENHA) { sessionStorage.setItem('adminMode','true'); }
+if (sessionStorage.getItem('adminMode') === 'true') { document.getElementById('navAdmin').style.display = 'flex'; }
 
 // ══════════════════════════════════════════════
 // ESTADO
