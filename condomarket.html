@@ -1,0 +1,2574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>CondoMarket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ============================================
+   DESIGN SYSTEM
+============================================ */
+:root {
+  --brand: #7C3AED;
+  --brand-dark: #5B21B6;
+  --brand-light: #EDE9FE;
+  --accent: #EC4899;
+  --accent-light: #FCE7F3;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --bg: #F8F7FF;
+  --surface: #FFFFFF;
+  --surface2: #F3F0FF;
+  --text: #1A1033;
+  --text2: #6B7280;
+  --text3: #9CA3AF;
+  --border: #E5E0FF;
+  --shadow: 0 2px 16px rgba(124,58,237,0.08);
+  --shadow-md: 0 4px 24px rgba(124,58,237,0.12);
+  --shadow-lg: 0 8px 40px rgba(124,58,237,0.18);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-lg: 24px;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   LAYOUT — SHELL
+============================================ */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR (desktop) */
+.sidebar {
+  width: 260px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo h1 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-logo span {
+  font-size: 11px;
+  color: var(--text3);
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all 0.18s ease;
+  position: relative;
+  user-select: none;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item:hover { background: var(--surface2); color: var(--brand); }
+.nav-item.active { background: var(--brand-light); color: var(--brand); font-weight: 600; }
+.nav-item .nav-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.nav-item .badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-bottom {
+  padding: 12px 10px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.user-chip:hover { background: var(--surface2); }
+.user-chip .avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+  overflow: hidden;
+}
+.user-chip .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-chip .user-info { flex: 1; min-width: 0; }
+.user-chip .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-chip .user-unit { font-size: 11px; color: var(--text3); }
+
+/* MAIN CONTENT */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP BAR */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+.icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all 0.18s;
+  position: relative;
+}
+.icon-btn:hover { background: var(--brand-light); }
+.icon-btn .badge {
+  position: absolute; top: 2px; right: 2px;
+  width: 14px; height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  font-size: 8px;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+}
+
+/* BOTTOM NAV (mobile) */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+
+.bottom-nav-inner {
+  display: flex;
+  justify-content: space-around;
+}
+
+.bnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 12px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--text3);
+  font-size: 10px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  transition: color 0.18s;
+  position: relative;
+}
+.bnav-item .bnav-icon { font-size: 20px; }
+.bnav-item.active { color: var(--brand); }
+.bnav-item .badge {
+  position: absolute; top: 2px; right: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* PAGE CONTENT */
+.page {
+  display: none;
+  flex: 1;
+  padding: 24px;
+  animation: fadeIn 0.25s ease;
+}
+.page.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   COMPONENTES COMUNS
+============================================ */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.card-sm {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  border: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-accent:hover { background: #db2777; transform: translateY(-1px); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--brand);
+  border: 1.5px solid var(--brand);
+}
+.btn-outline:hover { background: var(--brand-light); }
+
+.btn-ghost {
+  background: var(--surface2);
+  color: var(--text2);
+}
+.btn-ghost:hover { background: var(--border); color: var(--text); }
+
+.btn-danger {
+  background: #FEE2E2;
+  color: var(--danger);
+}
+.btn-danger:hover { background: var(--danger); color: #fff; }
+
+.btn-full { width: 100%; }
+.btn-sm { padding: 7px 14px; font-size: 12px; }
+.btn-lg { padding: 14px 28px; font-size: 16px; }
+
+.input-group { margin-bottom: 16px; }
+.input-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.18s;
+}
+.input:focus { border-color: var(--brand); }
+.input::placeholder { color: var(--text3); }
+textarea.input { resize: vertical; min-height: 80px; }
+
+select.input { appearance: none; cursor: pointer; }
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.chip-brand { background: var(--brand-light); color: var(--brand); }
+.chip-accent { background: var(--accent-light); color: var(--accent); }
+.chip-success { background: #D1FAE5; color: var(--success); }
+.chip-warning { background: #FEF3C7; color: var(--warning); }
+.chip-danger { background: #FEE2E2; color: var(--danger); }
+.chip-gray { background: #F3F4F6; color: var(--text2); }
+
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text3);
+}
+.empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+.avatar {
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #fff; flex-shrink: 0;
+  overflow: hidden;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-sm { width: 32px; height: 32px; font-size: 13px; }
+.avatar-md { width: 44px; height: 44px; font-size: 17px; }
+.avatar-lg { width: 64px; height: 64px; font-size: 24px; }
+.avatar-xl { width: 88px; height: 88px; font-size: 32px; }
+
+.toast-container {
+  position: fixed;
+  bottom: 80px; right: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--text);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+  animation: slideIn 0.25s ease, fadeOut 0.3s ease 2.7s forwards;
+  pointer-events: none;
+  max-width: 280px;
+}
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+
+@keyframes slideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateX(120%); }
+}
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 500;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+  padding: 16px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  width: 100%; max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.25s ease;
+}
+@keyframes modalIn {
+  from { transform: scale(0.95) translateY(10px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+.modal-header {
+  padding: 20px 24px 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-header h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+.modal-body { padding: 20px 24px 24px; }
+.modal-close {
+  width: 32px; height: 32px;
+  border: none; background: var(--surface2);
+  border-radius: 50%; cursor: pointer;
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s;
+}
+.modal-close:hover { background: var(--border); }
+
+/* ============================================
+   AUTH PAGE
+============================================ */
+.auth-page {
+  display: none;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #F8F7FF 0%, #EDE9FE 100%);
+  padding: 20px;
+}
+.auth-page.active { display: flex; }
+.auth-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  width: 100%; max-width: 400px;
+  box-shadow: var(--shadow-lg);
+}
+.auth-logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.auth-logo h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.auth-logo p { color: var(--text3); font-size: 13px; margin-top: 4px; }
+.auth-tabs { display: flex; margin-bottom: 24px; background: var(--surface2); border-radius: var(--radius-sm); padding: 4px; }
+.auth-tab {
+  flex: 1; padding: 8px; text-align: center;
+  border: none; background: none;
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  cursor: pointer; border-radius: 8px; color: var(--text3);
+  transition: all 0.18s;
+}
+.auth-tab.active { background: var(--surface); color: var(--brand); box-shadow: var(--shadow); }
+
+/* ============================================
+   HOME PAGE
+============================================ */
+.home-banner {
+  background: linear-gradient(135deg, var(--brand) 0%, #9333EA 50%, var(--accent) 100%);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  color: #fff;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.home-banner::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 160px; height: 160px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.home-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; right: 40px;
+  width: 100px; height: 100px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+.home-banner h2 { font-family: var(--font-display); font-size: 22px; font-weight: 800; margin-bottom: 6px; position: relative; }
+.home-banner p { font-size: 13px; opacity: 0.85; position: relative; }
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.stat-card .stat-num {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--brand);
+}
+.stat-card .stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.category-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 20px;
+  scrollbar-width: none;
+}
+.category-scroll::-webkit-scrollbar { display: none; }
+.cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s;
+  color: var(--text2);
+}
+.cat-btn:hover, .cat-btn.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+.ads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.ad-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.ad-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.ad-img {
+  height: 140px;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.ad-img img { width: 100%; height: 100%; object-fit: cover; }
+.ad-body { padding: 12px; }
+.ad-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ad-price { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--brand); }
+.ad-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.ad-seller { font-size: 11px; color: var(--text3); }
+.ad-rating { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--warning); font-weight: 600; }
+
+/* ============================================
+   CHAT PAGE
+============================================ */
+.chat-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 0;
+  height: calc(100vh - 65px);
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.chat-list {
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  background: var(--surface);
+}
+
+.chat-list-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  position: sticky; top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid var(--border);
+}
+.chat-item:hover { background: var(--surface2); }
+.chat-item.active { background: var(--brand-light); }
+.chat-item .chat-info { flex: 1; min-width: 0; }
+.chat-item .chat-name { font-size: 14px; font-weight: 600; }
+.chat-item .chat-preview { font-size: 12px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.chat-item .chat-time { font-size: 10px; color: var(--text3); flex-shrink: 0; }
+.chat-item .unread-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.chat-window {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-window-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface);
+}
+.chat-window-header .chat-partner { flex: 1; }
+.chat-window-header .chat-partner-name { font-size: 15px; font-weight: 600; }
+.chat-window-header .chat-partner-unit { font-size: 12px; color: var(--text3); }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg);
+}
+
+.msg-bubble {
+  max-width: 72%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+}
+.msg-bubble .msg-time {
+  font-size: 10px;
+  opacity: 0.6;
+  margin-top: 4px;
+  display: block;
+}
+
+.msg-in {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+}
+
+.msg-out {
+  background: var(--brand);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+}
+.msg-out .msg-time { opacity: 0.7; }
+
+.chat-input-bar {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface);
+}
+.chat-input-bar .input {
+  flex: 1;
+  border-radius: 20px;
+  padding: 9px 16px;
+  resize: none;
+  border: 1.5px solid var(--border);
+}
+.chat-input-bar .input:focus { border-color: var(--brand); }
+.send-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--brand);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+.send-btn:hover { background: var(--brand-dark); transform: scale(1.05); }
+
+.no-chat-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text3);
+  gap: 12px;
+}
+.no-chat-selected .icon { font-size: 48px; }
+
+/* ============================================
+   FORUM PAGE
+============================================ */
+.forum-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.forum-post-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.18s;
+  box-shadow: var(--shadow);
+}
+.forum-post-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md); }
+
+.forum-post-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.forum-post-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  flex: 1;
+}
+
+.forum-post-body { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+
+.forum-post-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text3);
+}
+.forum-post-footer .author { display: flex; align-items: center; gap: 6px; }
+
+.official-reply {
+  background: var(--brand-light);
+  border-left: 3px solid var(--brand);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 12px 14px;
+  margin-top: 12px;
+  font-size: 13px;
+}
+.official-reply .label { font-size: 11px; font-weight: 700; color: var(--brand); margin-bottom: 4px; }
+
+/* Forum Detail */
+.forum-detail { display: none; }
+.forum-detail.active { display: block; }
+.forum-list { display: block; }
+.forum-list.hidden { display: none; }
+
+.comment-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.comment-item:last-child { border-bottom: none; }
+.comment-content { flex: 1; }
+.comment-author { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.comment-text { font-size: 14px; color: var(--text2); line-height: 1.5; }
+.comment-time { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* ============================================
+   NOTIFICATIONS PAGE
+============================================ */
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.notif-item:hover { border-color: var(--brand); }
+.notif-item.unread { background: var(--brand-light); border-color: var(--brand); }
+.notif-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.notif-icon.chat { background: #EFF6FF; }
+.notif-icon.forum { background: #F0FDF4; }
+.notif-icon.pedido { background: #FEF3C7; }
+.notif-icon.anuncio { background: var(--accent-light); }
+.notif-body { flex: 1; }
+.notif-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.notif-corpo { font-size: 13px; color: var(--text2); }
+.notif-time { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* ============================================
+   REVIEWS SECTION
+============================================ */
+.stars-input { display: flex; gap: 6px; margin-bottom: 16px; }
+.star-btn {
+  font-size: 28px;
+  cursor: pointer;
+  transition: transform 0.1s;
+  border: none; background: none;
+  filter: grayscale(1);
+  opacity: 0.4;
+}
+.star-btn.active { filter: none; opacity: 1; transform: scale(1.1); }
+
+.review-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.review-item:last-child { border-bottom: none; }
+.review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.review-stars { color: var(--warning); font-size: 13px; }
+.review-text { font-size: 14px; color: var(--text2); line-height: 1.5; }
+.review-date { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* ============================================
+   SETTINGS PAGE
+============================================ */
+.settings-section { margin-bottom: 28px; }
+.settings-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.settings-item:hover { border-color: var(--brand); background: var(--brand-light); }
+.settings-item .s-icon {
+  width: 38px; height: 38px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+.settings-item .s-text { flex: 1; }
+.settings-item .s-title { font-size: 14px; font-weight: 600; }
+.settings-item .s-sub { font-size: 12px; color: var(--text3); }
+.settings-item .s-arrow { color: var(--text3); font-size: 18px; }
+
+/* Toggle */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px; height: 24px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  left: 3px; top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle input:checked + .toggle-slider { background: var(--brand); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+/* ============================================
+   PROFILE EDIT
+============================================ */
+.avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.avatar-upload-btn {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+}
+.avatar-upload-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.4);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+.avatar-upload-btn:hover .avatar-upload-overlay { opacity: 1; }
+
+/* ============================================
+   AD DETAIL MODAL
+============================================ */
+.ad-detail-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 60px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+/* ============================================
+   LOADING
+============================================ */
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 20px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.mobile-open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+  .main-content { margin-left: 0; padding-bottom: 70px; }
+  .bottom-nav { display: block; }
+  .topbar { padding: 12px 16px; }
+  .topbar .menu-btn { display: flex; }
+  .page { padding: 16px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr 1fr; }
+  .stats-row { grid-template-columns: repeat(3, 1fr); }
+  .ads-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .chat-layout { grid-template-columns: 1fr; height: auto; }
+  .chat-list { display: none; }
+  .chat-list.mobile-show { display: block; height: 100%; }
+  .chat-window { display: none; height: calc(100vh - 140px); }
+  .chat-window.mobile-show { display: flex; }
+  .home-banner h2 { font-size: 18px; }
+}
+
+@media (max-width: 480px) {
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .stats-row { gap: 8px; }
+  .stat-card .stat-num { font-size: 20px; }
+}
+
+/* Sidebar overlay mobile */
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 99;
+}
+.sidebar-overlay.active { display: block; }
+
+.menu-btn {
+  display: none;
+  width: 38px; height: 38px;
+  border: none; background: var(--surface2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 18px;
+  align-items: center; justify-content: center;
+}
+@media (max-width: 768px) { .menu-btn { display: flex; } }
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     AUTH PAGE
+============================================ -->
+<div class="auth-page active" id="authPage">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <h1>CondoMarket</h1>
+      <p>O mercado do seu condomínio</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Cadastrar</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginForm">
+      <div class="input-group">
+        <label>E-mail</label>
+        <input type="email" class="input" id="loginEmail" placeholder="seu@email.com"/>
+      </div>
+      <div class="input-group">
+        <label>Senha</label>
+        <input type="password" class="input" id="loginPassword" placeholder="••••••••"/>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">Entrar</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerForm" style="display:none">
+      <div class="input-group">
+        <label>Nome completo</label>
+        <input type="text" class="input" id="regNome" placeholder="João Silva"/>
+      </div>
+      <div class="input-group">
+        <label>E-mail</label>
+        <input type="email" class="input" id="regEmail" placeholder="seu@email.com"/>
+      </div>
+      <div class="input-group">
+        <label>Unidade / Apartamento</label>
+        <input type="text" class="input" id="regUnidade" placeholder="Ex: 124 01"/>
+      </div>
+      <div class="input-group">
+        <label>WhatsApp (com DDD)</label>
+        <input type="tel" class="input" id="regWhatsapp" placeholder="(11) 99999-9999"/>
+      </div>
+      <div class="input-group">
+        <label>Senha</label>
+        <input type="password" class="input" id="regPassword" placeholder="Mínimo 6 caracteres"/>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="doRegister()">Criar Conta</button>
+    </div>
+
+    <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:20px;">
+      🏢 Apenas moradores do condomínio
+    </p>
+  </div>
+</div>
+
+<!-- ============================================
+     APP SHELL
+============================================ -->
+<div class="app-shell" id="appShell" style="display:none">
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h1>CondoMarket</h1>
+      <span id="sb-condo-name">Seu condomínio</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="navigate('home')" id="nav-home">
+        <span class="nav-icon">🏪</span> Anúncios
+      </button>
+      <button class="nav-item" onclick="navigate('chat')" id="nav-chat">
+        <span class="nav-icon">💬</span> Conversas
+        <span class="badge" id="sb-chat-badge" style="display:none">0</span>
+      </button>
+      <button class="nav-item" onclick="navigate('forum')" id="nav-forum">
+        <span class="nav-icon">📋</span> Fórum
+      </button>
+      <button class="nav-item" onclick="navigate('notifications')" id="nav-notifications">
+        <span class="nav-icon">🔔</span> Notificações
+        <span class="badge" id="sb-notif-badge" style="display:none">0</span>
+      </button>
+      <button class="nav-item" onclick="navigate('meus')" id="nav-meus">
+        <span class="nav-icon">📦</span> Meus Anúncios
+      </button>
+      <div class="divider"></div>
+      <button class="nav-item" onclick="navigate('settings')" id="nav-settings">
+        <span class="nav-icon">⚙️</span> Configurações
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip" onclick="navigate('profile')">
+        <div class="avatar avatar-sm" id="sb-avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sb-user-name">Carregando...</div>
+          <div class="user-unit" id="sb-user-unit">Unidade —</div>
+        </div>
+      </div>
+      <button class="nav-item" onclick="doLogout()" style="color:var(--danger)">
+        <span class="nav-icon">🚪</span> Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="menu-btn" onclick="openSidebar()">☰</button>
+      <div class="topbar-title" id="topbar-title">Anúncios</div>
+      <div class="topbar-actions">
+        <button class="icon-btn" onclick="navigate('notifications')" title="Notificações">
+          🔔
+          <span class="badge" id="tb-notif-badge" style="display:none"></span>
+        </button>
+        <button class="icon-btn" onclick="navigate('profile')" title="Perfil">
+          <div class="avatar avatar-sm" id="tb-avatar" style="width:28px;height:28px;font-size:12px">?</div>
+        </button>
+      </div>
+    </header>
+
+    <!-- ==================== HOME ==================== -->
+    <div class="page active" id="page-home">
+      <div class="home-banner">
+        <h2>🛍️ O mercado do seu condomínio</h2>
+        <p>Compre, venda e contrate com seus vizinhos</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-vendedores">—</div>
+          <div class="stat-label">Vendedores</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-anuncios">—</div>
+          <div class="stat-label">Anúncios</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-moradores">—</div>
+          <div class="stat-label">Moradores</div>
+        </div>
+      </div>
+
+      <div class="category-scroll">
+        <button class="cat-btn active" data-cat="todos" onclick="filterCat(this,'todos')">🏪 Todos</button>
+        <button class="cat-btn" data-cat="comida" onclick="filterCat(this,'comida')">🍽️ Comida</button>
+        <button class="cat-btn" data-cat="servicos" onclick="filterCat(this,'servicos')">🧹 Serviços</button>
+        <button class="cat-btn" data-cat="artesanato" onclick="filterCat(this,'artesanato')">🎨 Artesanato</button>
+        <button class="cat-btn" data-cat="aulas" onclick="filterCat(this,'aulas')">💪 Aulas</button>
+        <button class="cat-btn" data-cat="reparos" onclick="filterCat(this,'reparos')">🔧 Reparos</button>
+        <button class="cat-btn" data-cat="produtos" onclick="filterCat(this,'produtos')">🛒 Produtos</button>
+      </div>
+
+      <div id="ads-loading" class="spinner"></div>
+      <div class="ads-grid" id="ads-grid" style="display:none"></div>
+      <div class="empty-state" id="ads-empty" style="display:none">
+        <div class="empty-icon">🛒</div>
+        <p>Nenhum anúncio encontrado</p>
+      </div>
+
+      <button class="btn btn-accent" style="position:fixed;bottom:88px;right:16px;border-radius:28px;padding:14px 22px;box-shadow:var(--shadow-lg);z-index:40" onclick="openModal('newAdModal')">
+        ✨ Novo Anúncio
+      </button>
+    </div>
+
+    <!-- ==================== CHAT ==================== -->
+    <div class="page" id="page-chat">
+      <div class="chat-layout" id="chatLayout">
+        <div class="chat-list" id="chatList">
+          <div class="chat-list-header">💬 Conversas</div>
+          <div id="chats-loading" class="spinner"></div>
+          <div id="chats-list-inner"></div>
+          <div class="empty-state" id="chats-empty" style="display:none;padding:30px 16px">
+            <div class="empty-icon">💬</div>
+            <p>Nenhuma conversa ainda</p>
+          </div>
+        </div>
+        <div class="chat-window" id="chatWindow">
+          <div class="no-chat-selected" id="noChatSelected">
+            <div class="icon">💬</div>
+            <p>Selecione uma conversa</p>
+          </div>
+          <div id="chatActive" style="display:none;flex-direction:column;height:100%">
+            <div class="chat-window-header">
+              <button class="btn btn-ghost btn-sm" id="chatBackBtn" onclick="mobileChatBack()" style="display:none">←</button>
+              <div class="avatar avatar-sm" id="chat-partner-avatar">?</div>
+              <div class="chat-partner">
+                <div class="chat-partner-name" id="chat-partner-name">—</div>
+                <div class="chat-partner-unit" id="chat-partner-unit">—</div>
+              </div>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-bar">
+              <input class="input" id="msgInput" placeholder="Digite uma mensagem..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendMessage();event.preventDefault()}"/>
+              <button class="send-btn" onclick="sendMessage()">➤</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FORUM ==================== -->
+    <div class="page" id="page-forum">
+
+      <!-- LISTA -->
+      <div class="forum-list" id="forumList">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div class="section-title" style="margin:0">📋 Fórum do Condomínio</div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('newPostModal')">+ Novo Post</button>
+        </div>
+
+        <div class="forum-filters">
+          <button class="cat-btn active" data-fcat="todos" onclick="filterForum(this,'todos')">Todos</button>
+          <button class="cat-btn" data-fcat="sugestao" onclick="filterForum(this,'sugestao')">💡 Sugestão</button>
+          <button class="cat-btn" data-fcat="reclamacao" onclick="filterForum(this,'reclamacao')">😤 Reclamação</button>
+          <button class="cat-btn" data-fcat="denuncia" onclick="filterForum(this,'denuncia')">⚠️ Denúncia</button>
+          <button class="cat-btn" data-fcat="ideia" onclick="filterForum(this,'ideia')">🚀 Ideia</button>
+        </div>
+
+        <div id="forum-loading" class="spinner"></div>
+        <div id="forum-posts-list"></div>
+        <div class="empty-state" id="forum-empty" style="display:none">
+          <div class="empty-icon">📋</div>
+          <p>Nenhum post ainda. Seja o primeiro!</p>
+        </div>
+      </div>
+
+      <!-- DETALHE DO POST -->
+      <div class="forum-detail" id="forumDetail">
+        <button class="btn btn-ghost btn-sm" onclick="backToForum()" style="margin-bottom:16px">← Voltar</button>
+        <div class="card" id="forumDetailCard"></div>
+
+        <div style="margin-top:20px">
+          <div class="section-title" style="font-size:16px">Comentários</div>
+          <div id="forum-comments-list"></div>
+          <div class="empty-state" id="forum-comments-empty" style="display:none">
+            <p>Nenhum comentário ainda</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="input-group" style="margin:0">
+            <textarea class="input" id="commentInput" placeholder="Escreva seu comentário..."></textarea>
+          </div>
+          <button class="btn btn-primary" style="margin-top:10px;width:100%" onclick="submitComment()">Comentar</button>
+        </div>
+
+        <!-- Admin: resposta oficial -->
+        <div id="adminReplySection" style="display:none;margin-top:16px">
+          <div class="card" style="border:2px solid var(--brand)">
+            <p style="font-size:13px;font-weight:700;color:var(--brand);margin-bottom:10px">🛡️ Resposta Oficial (Admin)</p>
+            <div class="input-group" style="margin:0">
+              <textarea class="input" id="officialReplyInput" placeholder="Resposta oficial do condomínio..."></textarea>
+            </div>
+            <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="submitOfficialReply()">Fixar Resposta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== NOTIFICATIONS ==================== -->
+    <div class="page" id="page-notifications">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div class="section-title" style="margin:0">🔔 Notificações</div>
+        <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Marcar todas lidas</button>
+      </div>
+      <div id="notif-loading" class="spinner"></div>
+      <div id="notif-list"></div>
+      <div class="empty-state" id="notif-empty" style="display:none">
+        <div class="empty-icon">🔔</div>
+        <p>Nenhuma notificação</p>
+      </div>
+    </div>
+
+    <!-- ==================== MEUS ANÚNCIOS ==================== -->
+    <div class="page" id="page-meus">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div class="section-title" style="margin:0">📦 Meus Anúncios</div>
+        <button class="btn btn-accent btn-sm" onclick="openModal('newAdModal')">+ Novo</button>
+      </div>
+      <div id="meus-loading" class="spinner"></div>
+      <div id="meus-list"></div>
+      <div class="empty-state" id="meus-empty" style="display:none">
+        <div class="empty-icon">📦</div>
+        <p>Você ainda não tem anúncios</p>
+        <button class="btn btn-primary" style="margin-top:12px" onclick="openModal('newAdModal')">Criar Anúncio</button>
+      </div>
+    </div>
+
+    <!-- ==================== SETTINGS ==================== -->
+    <div class="page" id="page-settings">
+      <div class="section-title">⚙️ Configurações</div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Conta</div>
+        <div class="settings-item" onclick="navigate('profile')">
+          <div class="s-icon">👤</div>
+          <div class="s-text">
+            <div class="s-title">Editar Perfil</div>
+            <div class="s-sub">Nome, foto, unidade, WhatsApp</div>
+          </div>
+          <span class="s-arrow">›</span>
+        </div>
+        <div class="settings-item" onclick="openModal('changePwModal')">
+          <div class="s-icon">🔒</div>
+          <div class="s-text">
+            <div class="s-title">Trocar Senha</div>
+            <div class="s-sub">Atualizar credenciais de acesso</div>
+          </div>
+          <span class="s-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Notificações</div>
+        <div class="settings-item">
+          <div class="s-icon">💬</div>
+          <div class="s-text">
+            <div class="s-title">Mensagens</div>
+            <div class="s-sub">Novas mensagens no chat</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-chat" checked onchange="saveNotifPref('notif_chat',this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="settings-item">
+          <div class="s-icon">📋</div>
+          <div class="s-text">
+            <div class="s-title">Fórum</div>
+            <div class="s-sub">Respostas nos seus posts</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-forum" checked onchange="saveNotifPref('notif_forum',this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="settings-item">
+          <div class="s-icon">📦</div>
+          <div class="s-text">
+            <div class="s-title">Pedidos</div>
+            <div class="s-sub">Confirmações e atualizações</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-pedidos" checked onchange="saveNotifPref('notif_pedidos',this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="settings-item">
+          <div class="s-icon">✨</div>
+          <div class="s-text">
+            <div class="s-title">Anúncios</div>
+            <div class="s-sub">Status dos seus anúncios</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-anuncios" checked onchange="saveNotifPref('notif_anuncios',this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="settings-item" onclick="requestPushPermission()">
+          <div class="s-icon">🔔</div>
+          <div class="s-text">
+            <div class="s-title">Push Notifications</div>
+            <div class="s-sub" id="push-status">Clique para ativar</div>
+          </div>
+          <span class="s-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Dados & Privacidade</div>
+        <div class="settings-item" onclick="openModal('deleteAccountModal')">
+          <div class="s-icon" style="background:#FEE2E2">🗑️</div>
+          <div class="s-text">
+            <div class="s-title" style="color:var(--danger)">Excluir Conta</div>
+            <div class="s-sub">Remover todos os seus dados</div>
+          </div>
+          <span class="s-arrow">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PROFILE ==================== -->
+    <div class="page" id="page-profile">
+      <div class="section-title">👤 Meu Perfil</div>
+      <div class="card" style="margin-bottom:24px">
+        <div class="avatar-upload">
+          <div class="avatar-upload-btn avatar avatar-xl" id="profile-avatar" onclick="document.getElementById('avatarInput').click()">
+            ?
+            <div class="avatar-upload-overlay">📷</div>
+          </div>
+          <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)"/>
+          <div>
+            <p style="font-weight:600;margin-bottom:4px">Foto de Perfil</p>
+            <p style="font-size:12px;color:var(--text3)">Clique para alterar</p>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Nome completo</label>
+          <input type="text" class="input" id="profile-nome" placeholder="Seu nome"/>
+        </div>
+        <div class="grid-2" style="gap:12px">
+          <div class="input-group">
+            <label>Unidade</label>
+            <input type="text" class="input" id="profile-unidade" placeholder="Ex: 124 01"/>
+          </div>
+          <div class="input-group">
+            <label>WhatsApp</label>
+            <input type="tel" class="input" id="profile-whatsapp" placeholder="(11) 99999-9999"/>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="saveProfile()">💾 Salvar Alterações</button>
+      </div>
+
+      <!-- Avaliações recebidas -->
+      <div class="section-title" style="font-size:16px">⭐ Avaliações Recebidas</div>
+      <div class="card" id="reviews-section">
+        <div id="reviews-loading" class="spinner"></div>
+        <div id="reviews-list"></div>
+        <div class="empty-state" id="reviews-empty" style="display:none">
+          <div class="empty-icon">⭐</div>
+          <p>Nenhuma avaliação ainda</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+
+</div><!-- end app-shell -->
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav" id="bottomNav" style="display:none">
+  <div class="bottom-nav-inner">
+    <button class="bnav-item active" onclick="navigate('home')" id="bnav-home">
+      <span class="bnav-icon">🏪</span>
+      <span>Início</span>
+    </button>
+    <button class="bnav-item" onclick="navigate('chat')" id="bnav-chat">
+      <span class="bnav-icon">💬</span>
+      <span>Chats</span>
+      <span class="badge" id="bnav-chat-badge" style="display:none">0</span>
+    </button>
+    <button class="bnav-item" onclick="navigate('forum')" id="bnav-forum">
+      <span class="bnav-icon">📋</span>
+      <span>Fórum</span>
+    </button>
+    <button class="bnav-item" onclick="navigate('notifications')" id="bnav-notifications">
+      <span class="bnav-icon">🔔</span>
+      <span>Avisos</span>
+      <span class="badge" id="bnav-notif-badge" style="display:none">0</span>
+    </button>
+    <button class="bnav-item" onclick="navigate('settings')" id="bnav-settings">
+      <span class="bnav-icon">⚙️</span>
+      <span>Config</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ============================================
+     MODALS
+============================================ -->
+
+<!-- NEW AD -->
+<div class="modal-overlay" id="newAdModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✨ Novo Anúncio</h3>
+      <button class="modal-close" onclick="closeModal('newAdModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group"><label>Nome do produto/serviço</label><input type="text" class="input" id="ad-nome" placeholder="Ex: Bolo de chocolate"/></div>
+      <div class="input-group"><label>Descrição</label><textarea class="input" id="ad-desc" placeholder="Descreva seu produto ou serviço..."></textarea></div>
+      <div class="grid-2" style="gap:12px">
+        <div class="input-group"><label>Preço (R$)</label><input type="number" class="input" id="ad-preco" placeholder="0,00"/></div>
+        <div class="input-group"><label>Categoria</label>
+          <select class="input" id="ad-cat">
+            <option value="comida">🍽️ Comida</option>
+            <option value="servicos">🧹 Serviços</option>
+            <option value="artesanato">🎨 Artesanato</option>
+            <option value="aulas">💪 Aulas</option>
+            <option value="reparos">🔧 Reparos</option>
+            <option value="produtos">🛒 Produtos</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group"><label>Endereço / Local de entrega</label><input type="text" class="input" id="ad-endereco" placeholder="Ex: Bloco A, apt 101"/></div>
+      <button class="btn btn-accent btn-full btn-lg" onclick="publishAd()">🚀 Publicar Anúncio</button>
+    </div>
+  </div>
+</div>
+
+<!-- AD DETAIL -->
+<div class="modal-overlay" id="adDetailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="ad-detail-nome">—</h3>
+      <button class="modal-close" onclick="closeModal('adDetailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="ad-detail-body"></div>
+  </div>
+</div>
+
+<!-- NEW FORUM POST -->
+<div class="modal-overlay" id="newPostModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📋 Novo Post no Fórum</h3>
+      <button class="modal-close" onclick="closeModal('newPostModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group"><label>Categoria</label>
+        <select class="input" id="post-cat">
+          <option value="sugestao">💡 Sugestão</option>
+          <option value="reclamacao">😤 Reclamação</option>
+          <option value="denuncia">⚠️ Denúncia</option>
+          <option value="ideia">🚀 Ideia/Melhoria</option>
+        </select>
+      </div>
+      <div class="input-group"><label>Título</label><input type="text" class="input" id="post-titulo" placeholder="Resumo do seu post"/></div>
+      <div class="input-group"><label>Descrição</label><textarea class="input" id="post-conteudo" placeholder="Descreva com detalhes..." style="min-height:120px"></textarea></div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="publishPost()">📤 Publicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD -->
+<div class="modal-overlay" id="changePwModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🔒 Trocar Senha</h3>
+      <button class="modal-close" onclick="closeModal('changePwModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group"><label>Nova Senha</label><input type="password" class="input" id="new-pw" placeholder="Mínimo 6 caracteres"/></div>
+      <div class="input-group"><label>Confirmar Nova Senha</label><input type="password" class="input" id="confirm-pw" placeholder="Repita a senha"/></div>
+      <button class="btn btn-primary btn-full" onclick="changePassword()">Salvar Nova Senha</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>⭐ Avaliar Vendedor</h3>
+      <button class="modal-close" onclick="closeModal('reviewModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:12px;color:var(--text2);font-size:14px">Avalie <strong id="review-vendedor-nome">—</strong></p>
+      <div class="stars-input" id="starsInput">
+        <button class="star-btn" data-star="1" onclick="setStar(1)">⭐</button>
+        <button class="star-btn" data-star="2" onclick="setStar(2)">⭐</button>
+        <button class="star-btn" data-star="3" onclick="setStar(3)">⭐</button>
+        <button class="star-btn" data-star="4" onclick="setStar(4)">⭐</button>
+        <button class="star-btn" data-star="5" onclick="setStar(5)">⭐</button>
+      </div>
+      <div class="input-group"><label>Comentário (opcional)</label><textarea class="input" id="review-comment" placeholder="Como foi sua experiência?"></textarea></div>
+      <button class="btn btn-primary btn-full" onclick="submitReview()">Enviar Avaliação</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE ACCOUNT -->
+<div class="modal-overlay" id="deleteAccountModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>⚠️ Excluir Conta</h3>
+      <button class="modal-close" onclick="closeModal('deleteAccountModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text2);margin-bottom:16px">Tem certeza? Esta ação é irreversível e todos seus dados serão removidos.</p>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost btn-full" onclick="closeModal('deleteAccountModal')">Cancelar</button>
+        <button class="btn btn-danger btn-full" onclick="deleteAccount()">Sim, excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============================================
+     JAVASCRIPT
+============================================ -->
+<script>
+// ============================================
+// CONFIG — TROQUE PELOS SEUS DADOS DO SUPABASE
+// ============================================
+const SUPABASE_URL = 'https://SEU_PROJETO.supabase.co';
+const SUPABASE_KEY = 'SUA_ANON_KEY';
+// ============================================
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================================
+// STATE
+// ============================================
+let currentUser = null;
+let currentProfile = null;
+let currentPage = 'home';
+let currentChatId = null;
+let currentForumPostId = null;
+let allAds = [];
+let currentCat = 'todos';
+let currentForumCat = 'todos';
+let selectedStar = 0;
+let reviewData = {};
+let realtimeSubs = [];
+
+// ============================================
+// INIT
+// ============================================
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    await loadProfile();
+    showApp();
+    await Promise.all([loadAds(), loadChats(), loadNotifBadge()]);
+    subscribeRealtime();
+    checkPushStatus();
+  } else {
+    showAuth();
+  }
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      currentUser = session.user;
+      await loadProfile();
+      showApp();
+      await Promise.all([loadAds(), loadChats(), loadNotifBadge()]);
+      subscribeRealtime();
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null; currentProfile = null;
+      unsubscribeRealtime();
+      showAuth();
+    }
+  });
+})();
+
+// ============================================
+// AUTH
+// ============================================
+function showAuth() {
+  document.getElementById('authPage').classList.add('active');
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('bottomNav').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('authPage').classList.remove('active');
+  document.getElementById('appShell').style.display = 'flex';
+  document.getElementById('bottomNav').style.display = 'block';
+  updateSidebarUser();
+}
+
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw = document.getElementById('loginPassword').value;
+  if (!email || !pw) return toast('Preencha e-mail e senha', 'error');
+  const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+  if (error) toast(error.message, 'error');
+}
+
+async function doRegister() {
+  const nome = document.getElementById('regNome').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const unidade = document.getElementById('regUnidade').value.trim();
+  const whatsapp = document.getElementById('regWhatsapp').value.trim();
+  const pw = document.getElementById('regPassword').value;
+  if (!nome || !email || !unidade || !pw) return toast('Preencha todos os campos', 'error');
+  if (pw.length < 6) return toast('Senha deve ter pelo menos 6 caracteres', 'error');
+
+  const { data, error } = await sb.auth.signUp({ email, password: pw });
+  if (error) return toast(error.message, 'error');
+
+  if (data.user) {
+    await sb.from('profiles').upsert({
+      id: data.user.id, email, nome, unidade, whatsapp, role: 'morador'
+    });
+    toast('Conta criada! Verifique seu e-mail se necessário.', 'success');
+  }
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  toast('Até logo!');
+}
+
+// ============================================
+// PROFILE
+// ============================================
+async function loadProfile() {
+  const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  if (data) {
+    currentProfile = data;
+    updateSidebarUser();
+    loadNotifToggles();
+  }
+}
+
+function updateSidebarUser() {
+  if (!currentProfile) return;
+  const initials = (currentProfile.nome || '?')[0].toUpperCase();
+  document.getElementById('sb-user-name').textContent = currentProfile.nome || 'Usuário';
+  document.getElementById('sb-user-unit').textContent = 'Unid. ' + (currentProfile.unidade || '—');
+  setAvatarEl(document.getElementById('sb-avatar'), currentProfile, initials, true);
+  setAvatarEl(document.getElementById('tb-avatar'), currentProfile, initials, true);
+  setAvatarEl(document.getElementById('profile-avatar'), currentProfile, initials, false);
+  document.getElementById('profile-nome').value = currentProfile.nome || '';
+  document.getElementById('profile-unidade').value = currentProfile.unidade || '';
+  document.getElementById('profile-whatsapp').value = currentProfile.whatsapp || '';
+}
+
+function setAvatarEl(el, profile, initials, small) {
+  if (!el) return;
+  if (profile?.avatar_url) {
+    el.innerHTML = `<img src="${profile.avatar_url}" alt="avatar"/>`;
+  } else {
+    if (small) el.textContent = initials;
+    else el.innerHTML = initials + '<div class="avatar-upload-overlay">📷</div>';
+  }
+}
+
+async function saveProfile() {
+  const nome = document.getElementById('profile-nome').value.trim();
+  const unidade = document.getElementById('profile-unidade').value.trim();
+  const whatsapp = document.getElementById('profile-whatsapp').value.trim();
+  const { error } = await sb.from('profiles').update({ nome, unidade, whatsapp, updated_at: new Date() }).eq('id', currentUser.id);
+  if (error) return toast('Erro ao salvar', 'error');
+  currentProfile = { ...currentProfile, nome, unidade, whatsapp };
+  updateSidebarUser();
+  toast('Perfil salvo!', 'success');
+}
+
+async function uploadAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop();
+  const path = `${currentUser.id}/avatar.${ext}`;
+  const { error } = await sb.storage.from('avatars').upload(path, file, { upsert: true });
+  if (error) return toast('Erro ao fazer upload', 'error');
+  const { data } = sb.storage.from('avatars').getPublicUrl(path);
+  await sb.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', currentUser.id);
+  currentProfile.avatar_url = data.publicUrl;
+  updateSidebarUser();
+  toast('Foto atualizada!', 'success');
+}
+
+async function changePassword() {
+  const np = document.getElementById('new-pw').value;
+  const cp = document.getElementById('confirm-pw').value;
+  if (np !== cp) return toast('Senhas não conferem', 'error');
+  if (np.length < 6) return toast('Mínimo 6 caracteres', 'error');
+  const { error } = await sb.auth.updateUser({ password: np });
+  if (error) return toast(error.message, 'error');
+  closeModal('changePwModal');
+  toast('Senha alterada!', 'success');
+}
+
+async function deleteAccount() {
+  closeModal('deleteAccountModal');
+  await sb.from('profiles').delete().eq('id', currentUser.id);
+  await sb.auth.signOut();
+  toast('Conta excluída');
+}
+
+function loadNotifToggles() {
+  if (!currentProfile) return;
+  document.getElementById('notif-chat').checked = currentProfile.notif_chat !== false;
+  document.getElementById('notif-forum').checked = currentProfile.notif_forum !== false;
+  document.getElementById('notif-pedidos').checked = currentProfile.notif_pedidos !== false;
+  document.getElementById('notif-anuncios').checked = currentProfile.notif_anuncios !== false;
+}
+
+async function saveNotifPref(field, value) {
+  await sb.from('profiles').update({ [field]: value }).eq('id', currentUser.id);
+  currentProfile[field] = value;
+}
+
+// ============================================
+// ADS
+// ============================================
+async function loadAds() {
+  document.getElementById('ads-loading').style.display = 'block';
+  document.getElementById('ads-grid').style.display = 'none';
+  document.getElementById('ads-empty').style.display = 'none';
+
+  const { data, error } = await sb.from('anuncios').select('*, profiles(nome, unidade, avatar_url)').eq('status', 'aprovado').order('created_at', { ascending: false });
+  if (error) { document.getElementById('ads-loading').style.display = 'none'; return; }
+
+  allAds = data || [];
+  renderAds();
+
+  // Stats
+  const sellers = new Set(allAds.map(a => a.user_id)).size;
+  document.getElementById('stat-anuncios').textContent = allAds.length;
+  document.getElementById('stat-vendedores').textContent = sellers;
+  const { count } = await sb.from('profiles').select('id', { count: 'exact', head: true });
+  document.getElementById('stat-moradores').textContent = count || '—';
+}
+
+function renderAds() {
+  const grid = document.getElementById('ads-grid');
+  const empty = document.getElementById('ads-empty');
+  document.getElementById('ads-loading').style.display = 'none';
+
+  const filtered = currentCat === 'todos' ? allAds : allAds.filter(a => a.categoria === currentCat);
+
+  if (!filtered.length) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  const catEmoji = { comida:'🍽️', servicos:'🧹', artesanato:'🎨', aulas:'💪', reparos:'🔧', produtos:'🛒' };
+  grid.innerHTML = filtered.map(ad => `
+    <div class="ad-card" onclick="openAdDetail('${ad.id}')">
+      <div class="ad-img">${catEmoji[ad.categoria] || '🛒'}</div>
+      <div class="ad-body">
+        <div class="ad-name">${esc(ad.nome)}</div>
+        <div class="ad-price">R$ ${parseFloat(ad.preco||0).toFixed(2).replace('.',',')}</div>
+        <div class="ad-meta">
+          <span class="ad-seller">📍 ${esc(ad.profiles?.unidade||'—')}</span>
+          <span class="chip chip-brand" style="font-size:10px">${catEmoji[ad.categoria]||''} ${ad.categoria||''}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+}
+
+function filterCat(btn, cat) {
+  document.querySelectorAll('.cat-btn[data-cat]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat = cat;
+  renderAds();
+}
+
+function openAdDetail(id) {
+  const ad = allAds.find(a => a.id === id);
+  if (!ad) return;
+  const catEmoji = { comida:'🍽️', servicos:'🧹', artesanato:'🎨', aulas:'💪', reparos:'🔧', produtos:'🛒' };
+  document.getElementById('ad-detail-nome').textContent = ad.nome;
+  document.getElementById('ad-detail-body').innerHTML = `
+    <div style="font-size:64px;text-align:center;padding:20px;background:var(--surface2);border-radius:var(--radius);margin-bottom:16px">${catEmoji[ad.categoria]||'🛒'}</div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6">${esc(ad.descricao||'')}</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--brand)">R$ ${parseFloat(ad.preco||0).toFixed(2).replace('.',',')}</div>
+      <span class="chip chip-brand">${catEmoji[ad.categoria]||''} ${ad.categoria||''}</span>
+    </div>
+    <div class="card-sm" style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Vendedor</div>
+      <div style="font-weight:600">${esc(ad.profiles?.nome||'—')}</div>
+      <div style="font-size:12px;color:var(--text3)">Unid. ${esc(ad.profiles?.unidade||'—')}</div>
+    </div>
+    ${ad.user_id !== currentUser?.id ? `
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary btn-full" onclick="startChat('${ad.id}','${ad.user_id}','${esc(ad.profiles?.nome||'')}')">💬 Conversar</button>
+      <button class="btn btn-outline" onclick="openReview('${ad.user_id}','${esc(ad.profiles?.nome||'')}','${ad.id}')">⭐</button>
+    </div>` : `<span class="chip chip-brand">Seu anúncio</span>`}
+  `;
+  openModal('adDetailModal');
+}
+
+async function publishAd() {
+  const nome = document.getElementById('ad-nome').value.trim();
+  const desc = document.getElementById('ad-desc').value.trim();
+  const preco = document.getElementById('ad-preco').value;
+  const cat = document.getElementById('ad-cat').value;
+  const endereco = document.getElementById('ad-endereco').value.trim();
+  if (!nome || !preco) return toast('Nome e preço são obrigatórios', 'error');
+
+  const { error } = await sb.from('anuncios').insert({
+    user_id: currentUser.id, nome, descricao: desc, preco: parseFloat(preco),
+    categoria: cat, endereco, status: 'pendente'
+  });
+  if (error) return toast('Erro ao publicar', 'error');
+  closeModal('newAdModal');
+  toast('Anúncio enviado para aprovação!', 'success');
+  ['ad-nome','ad-desc','ad-preco','ad-endereco'].forEach(id => document.getElementById(id).value = '');
+}
+
+async function loadMeusAnuncios() {
+  document.getElementById('meus-loading').style.display = 'block';
+  document.getElementById('meus-list').innerHTML = '';
+  document.getElementById('meus-empty').style.display = 'none';
+
+  const { data } = await sb.from('anuncios').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  document.getElementById('meus-loading').style.display = 'none';
+
+  if (!data || !data.length) { document.getElementById('meus-empty').style.display = 'block'; return; }
+
+  const statusChip = { aprovado: 'chip-success', pendente: 'chip-warning', reprovado: 'chip-danger' };
+  const statusLabel = { aprovado: '✅ Aprovado', pendente: '⏳ Pendente', reprovado: '❌ Reprovado' };
+  document.getElementById('meus-list').innerHTML = data.map(ad => `
+    <div class="card" style="margin-bottom:12px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:32px">${{comida:'🍽️',servicos:'🧹',artesanato:'🎨',aulas:'💪',reparos:'🔧',produtos:'🛒'}[ad.categoria]||'🛒'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:15px;margin-bottom:4px">${esc(ad.nome)}</div>
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--brand)">R$ ${parseFloat(ad.preco||0).toFixed(2).replace('.',',')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <span class="chip ${statusChip[ad.status]||'chip-gray'}">${statusLabel[ad.status]||ad.status}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteAd('${ad.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function deleteAd(id) {
+  if (!confirm('Excluir este anúncio?')) return;
+  await sb.from('anuncios').delete().eq('id', id);
+  toast('Anúncio excluído', 'success');
+  loadMeusAnuncios();
+}
+
+// ============================================
+// CHAT
+// ============================================
+async function loadChats() {
+  document.getElementById('chats-loading').style.display = 'block';
+  document.getElementById('chats-list-inner').innerHTML = '';
+  document.getElementById('chats-empty').style.display = 'none';
+
+  const { data } = await sb.from('chats')
+    .select('*, comprador:profiles!chats_comprador_id_fkey(nome,unidade,avatar_url), vendedor:profiles!chats_vendedor_id_fkey(nome,unidade,avatar_url)')
+    .or(`comprador_id.eq.${currentUser.id},vendedor_id.eq.${currentUser.id}`)
+    .order('ultima_mensagem_at', { ascending: false });
+
+  document.getElementById('chats-loading').style.display = 'none';
+  if (!data || !data.length) { document.getElementById('chats-empty').style.display = 'block'; return; }
+
+  let totalUnread = 0;
+  document.getElementById('chats-list-inner').innerHTML = data.map(chat => {
+    const isComprador = chat.comprador_id === currentUser.id;
+    const partner = isComprador ? chat.vendedor : chat.comprador;
+    const unread = isComprador ? chat.nao_lido_comprador : chat.nao_lido_vendedor;
+    totalUnread += (unread || 0);
+    const initials = (partner?.nome||'?')[0].toUpperCase();
+    const time = chat.ultima_mensagem_at ? new Date(chat.ultima_mensagem_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
+    return `
+    <div class="chat-item" onclick="openChat('${chat.id}','${partner?.nome||''}','${partner?.unidade||''}')">
+      <div class="avatar avatar-sm">${initials}</div>
+      <div class="chat-info">
+        <div class="chat-name">${esc(partner?.nome||'Usuário')}</div>
+        <div class="chat-preview">${esc(chat.ultima_mensagem||'Nenhuma mensagem')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="chat-time">${time}</span>
+        ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  setBadge(totalUnread);
+}
+
+function setBadge(n) {
+  ['sb-chat-badge','bnav-chat-badge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = n > 0 ? n : '';
+    el.style.display = n > 0 ? '' : 'none';
+  });
+}
+
+async function startChat(anuncioId, vendedorId, vendedorNome) {
+  if (vendedorId === currentUser.id) return toast('Não pode conversar consigo mesmo');
+  closeModal('adDetailModal');
+
+  // Verifica se já existe chat
+  const { data: existing } = await sb.from('chats')
+    .select('id')
+    .eq('comprador_id', currentUser.id)
+    .eq('vendedor_id', vendedorId)
+    .eq('anuncio_id', anuncioId)
+    .single();
+
+  let chatId;
+  if (existing) {
+    chatId = existing.id;
+  } else {
+    const { data, error } = await sb.from('chats').insert({
+      anuncio_id: anuncioId,
+      comprador_id: currentUser.id,
+      vendedor_id: vendedorId
+    }).select().single();
+    if (error) return toast('Erro ao iniciar conversa', 'error');
+    chatId = data.id;
+  }
+
+  navigate('chat');
+  await loadChats();
+  openChat(chatId, vendedorNome, '');
+}
+
+async function openChat(chatId, partnerName, partnerUnit) {
+  currentChatId = chatId;
+  document.getElementById('noChatSelected').style.display = 'none';
+  document.getElementById('chatActive').style.display = 'flex';
+  document.getElementById('chat-partner-name').textContent = partnerName || 'Usuário';
+  document.getElementById('chat-partner-unit').textContent = partnerUnit ? 'Unid. ' + partnerUnit : '';
+  document.getElementById('chat-partner-avatar').textContent = (partnerName||'?')[0].toUpperCase();
+
+  // Mobile: show window
+  if (window.innerWidth <= 768) {
+    document.getElementById('chatList').classList.remove('mobile-show');
+    document.getElementById('chatWindow').classList.add('mobile-show');
+    document.getElementById('chatBackBtn').style.display = 'flex';
+  }
+
+  // Mark items active
+  document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
+
+  await loadMessages(chatId);
+  subscribeMessages(chatId);
+
+  // Zero unread
+  const isComprador = (await sb.from('chats').select('comprador_id').eq('id',chatId).single()).data?.comprador_id === currentUser.id;
+  await sb.from('chats').update(isComprador ? { nao_lido_comprador: 0 } : { nao_lido_vendedor: 0 }).eq('id', chatId);
+}
+
+function mobileChatBack() {
+  document.getElementById('chatList').classList.add('mobile-show');
+  document.getElementById('chatWindow').classList.remove('mobile-show');
+  currentChatId = null;
+}
+
+async function loadMessages(chatId) {
+  const { data } = await sb.from('messages').select('*, sender:profiles(nome)').eq('chat_id', chatId).order('created_at');
+  renderMessages(data || []);
+}
+
+function renderMessages(msgs) {
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = msgs.map(m => {
+    const isMe = m.sender_id === currentUser.id;
+    const time = new Date(m.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="msg-bubble ${isMe ? 'msg-out' : 'msg-in'}">${esc(m.conteudo)}<span class="msg-time">${time}</span></div>`;
+  }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || !currentChatId) return;
+  input.value = '';
+
+  const { error } = await sb.from('messages').insert({ chat_id: currentChatId, sender_id: currentUser.id, conteudo: text });
+  if (error) return toast('Erro ao enviar', 'error');
+
+  // Update last message
+  await sb.from('chats').update({ ultima_mensagem: text, ultima_mensagem_at: new Date() }).eq('id', currentChatId);
+}
+
+function subscribeMessages(chatId) {
+  // Unsub previous
+  realtimeSubs.forEach(s => s.unsubscribe && s.unsubscribe());
+  realtimeSubs = [];
+
+  const sub = sb.channel(`messages:${chatId}`)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `chat_id=eq.${chatId}` },
+      payload => {
+        const msg = payload.new;
+        const container = document.getElementById('chatMessages');
+        const isMe = msg.sender_id === currentUser.id;
+        const time = new Date(msg.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+        container.innerHTML += `<div class="msg-bubble ${isMe ? 'msg-out' : 'msg-in'}">${esc(msg.conteudo)}<span class="msg-time">${time}</span></div>`;
+        container.scrollTop = container.scrollHeight;
+      }
+    ).subscribe();
+  realtimeSubs.push(sub);
+}
+
+// ============================================
+// FORUM
+// ============================================
+async function loadForum() {
+  document.getElementById('forum-loading').style.display = 'block';
+  document.getElementById('forum-posts-list').innerHTML = '';
+  document.getElementById('forum-empty').style.display = 'none';
+
+  let query = sb.from('forum_posts').select('*, autor:profiles(nome,unidade)').order('created_at', { ascending: false });
+  if (currentForumCat !== 'todos') query = query.eq('categoria', currentForumCat);
+
+  const { data } = await query;
+  document.getElementById('forum-loading').style.display = 'none';
+
+  if (!data || !data.length) { document.getElementById('forum-empty').style.display = 'block'; return; }
+
+  const catEmoji = { sugestao:'💡', reclamacao:'😤', denuncia:'⚠️', ideia:'🚀' };
+  const catLabel = { sugestao:'Sugestão', reclamacao:'Reclamação', denuncia:'Denúncia', ideia:'Ideia' };
+  const statusChip = { aberto:'chip-brand', resolvido:'chip-success', encerrado:'chip-gray' };
+
+  document.getElementById('forum-posts-list').innerHTML = data.map(post => `
+    <div class="forum-post-card" onclick="openForumPost('${post.id}')">
+      <div class="forum-post-header">
+        <div style="flex:1">
+          <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+            <span class="chip chip-brand">${catEmoji[post.categoria]||''} ${catLabel[post.categoria]||post.categoria}</span>
+            <span class="chip ${statusChip[post.status]||'chip-gray'}">${post.status}</span>
+          </div>
+          <div class="forum-post-title">${esc(post.titulo)}</div>
+        </div>
+      </div>
+      <div class="forum-post-body">${esc(post.conteudo).substring(0,180)}${post.conteudo.length>180?'...':''}</div>
+      ${post.resposta_oficial ? `<div class="official-reply"><div class="label">🛡️ Resposta Oficial</div>${esc(post.resposta_oficial)}</div>` : ''}
+      <div class="forum-post-footer">
+        <span class="author"><div class="avatar avatar-sm" style="width:22px;height:22px;font-size:10px">${(post.autor?.nome||'?')[0].toUpperCase()}</div> ${esc(post.autor?.nome||'—')} · Unid. ${esc(post.autor?.unidade||'—')}</span>
+        <span>💬 ${post.total_comentarios||0}</span>
+        <span>${timeAgo(post.created_at)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterForum(btn, cat) {
+  document.querySelectorAll('.cat-btn[data-fcat]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentForumCat = cat;
+  loadForum();
+}
+
+async function openForumPost(id) {
+  currentForumPostId = id;
+  document.getElementById('forumList').classList.add('hidden');
+  document.getElementById('forumDetail').classList.add('active');
+
+  const { data: post } = await sb.from('forum_posts').select('*, autor:profiles(nome,unidade)').eq('id', id).single();
+  if (!post) return;
+
+  const catEmoji = { sugestao:'💡', reclamacao:'😤', denuncia:'⚠️', ideia:'🚀' };
+  document.getElementById('forumDetailCard').innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <span class="chip chip-brand">${catEmoji[post.categoria]||''} ${post.categoria}</span>
+      <span class="chip chip-${post.status==='resolvido'?'success':'brand'}">${post.status}</span>
+    </div>
+    <h2 style="font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:12px">${esc(post.titulo)}</h2>
+    <p style="color:var(--text2);line-height:1.7;margin-bottom:16px">${esc(post.conteudo)}</p>
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)">
+      <div class="avatar avatar-sm" style="width:26px;height:26px;font-size:11px">${(post.autor?.nome||'?')[0].toUpperCase()}</div>
+      ${esc(post.autor?.nome||'—')} · Unid. ${esc(post.autor?.unidade||'—')} · ${timeAgo(post.created_at)}
+    </div>
+    ${post.resposta_oficial ? `<div class="official-reply" style="margin-top:16px"><div class="label">🛡️ Resposta Oficial do Condomínio</div>${esc(post.resposta_oficial)}</div>` : ''}
+  `;
+
+  // Admin reply section
+  if (currentProfile?.role === 'admin') {
+    document.getElementById('adminReplySection').style.display = 'block';
+    document.getElementById('officialReplyInput').value = post.resposta_oficial || '';
+  }
+
+  await loadForumComments(id);
+}
+
+async function loadForumComments(postId) {
+  const { data } = await sb.from('forum_comments').select('*, autor:profiles(nome,unidade)').eq('post_id', postId).order('created_at');
+  const list = document.getElementById('forum-comments-list');
+  const empty = document.getElementById('forum-comments-empty');
+
+  if (!data || !data.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = data.map(c => `
+    <div class="comment-item">
+      <div class="avatar avatar-sm">${(c.autor?.nome||'?')[0].toUpperCase()}</div>
+      <div class="comment-content">
+        <div class="comment-author">${esc(c.autor?.nome||'—')} <span style="font-weight:400;color:var(--text3)">· Unid. ${esc(c.autor?.unidade||'—')}</span></div>
+        <div class="comment-text">${esc(c.conteudo)}</div>
+        <div class="comment-time">${timeAgo(c.created_at)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function submitComment() {
+  const text = document.getElementById('commentInput').value.trim();
+  if (!text) return toast('Escreva um comentário', 'error');
+  const { error } = await sb.from('forum_comments').insert({ post_id: currentForumPostId, autor_id: currentUser.id, conteudo: text });
+  if (error) return toast('Erro ao comentar', 'error');
+  document.getElementById('commentInput').value = '';
+  toast('Comentário publicado!', 'success');
+  await loadForumComments(currentForumPostId);
+}
+
+async function submitOfficialReply() {
+  const text = document.getElementById('officialReplyInput').value.trim();
+  if (!text) return toast('Escreva a resposta oficial', 'error');
+  const { error } = await sb.from('forum_posts').update({ resposta_oficial: text, resposta_oficial_at: new Date(), resposta_oficial_by: currentUser.id }).eq('id', currentForumPostId);
+  if (error) return toast('Erro ao salvar', 'error');
+  toast('Resposta oficial fixada!', 'success');
+  openForumPost(currentForumPostId);
+}
+
+async function publishPost() {
+  const titulo = document.getElementById('post-titulo').value.trim();
+  const conteudo = document.getElementById('post-conteudo').value.trim();
+  const categoria = document.getElementById('post-cat').value;
+  if (!titulo || !conteudo) return toast('Preencha título e descrição', 'error');
+
+  const { error } = await sb.from('forum_posts').insert({ autor_id: currentUser.id, titulo, conteudo, categoria });
+  if (error) return toast('Erro ao publicar', 'error');
+  closeModal('newPostModal');
+  document.getElementById('post-titulo').value = '';
+  document.getElementById('post-conteudo').value = '';
+  toast('Post publicado!', 'success');
+  loadForum();
+}
+
+function backToForum() {
+  document.getElementById('forumList').classList.remove('hidden');
+  document.getElementById('forumDetail').classList.remove('active');
+  currentForumPostId = null;
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+async function loadNotifications() {
+  document.getElementById('notif-loading').style.display = 'block';
+  document.getElementById('notif-list').innerHTML = '';
+  document.getElementById('notif-empty').style.display = 'none';
+
+  const { data } = await sb.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
+  document.getElementById('notif-loading').style.display = 'none';
+
+  if (!data || !data.length) { document.getElementById('notif-empty').style.display = 'block'; return; }
+
+  const icons = { chat:'💬', forum:'📋', pedido:'📦', anuncio:'✨', avaliacao:'⭐', sistema:'🔔' };
+  document.getElementById('notif-list').innerHTML = data.map(n => `
+    <div class="notif-item ${!n.lida?'unread':''}" onclick="clickNotif('${n.id}','${n.link||''}')">
+      <div class="notif-icon ${n.tipo}">${icons[n.tipo]||'🔔'}</div>
+      <div class="notif-body">
+        <div class="notif-title">${esc(n.titulo)}</div>
+        ${n.corpo ? `<div class="notif-corpo">${esc(n.corpo)}</div>` : ''}
+        <div class="notif-time">${timeAgo(n.created_at)}</div>
+      </div>
+      ${!n.lida ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px"></div>' : ''}
+    </div>
+  `).join('');
+}
+
+async function clickNotif(id, link) {
+  await sb.from('notifications').update({ lida: true }).eq('id', id);
+  loadNotifBadge();
+  if (link) {
+    if (link.includes('/chat/')) navigate('chat');
+    else if (link.includes('/forum/')) navigate('forum');
+  }
+}
+
+async function markAllRead() {
+  await sb.from('notifications').update({ lida: true }).eq('user_id', currentUser.id).eq('lida', false);
+  loadNotifications();
+  loadNotifBadge();
+  toast('Todas marcadas como lidas', 'success');
+}
+
+async function loadNotifBadge() {
+  const { count } = await sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id).eq('lida', false);
+  const n = count || 0;
+  ['tb-notif-badge','sb-notif-badge','bnav-notif-badge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = n > 0 ? n : '';
+    el.style.display = n > 0 ? '' : 'none';
+  });
+}
+
+// ============================================
+// PUSH NOTIFICATIONS
+// ============================================
+function checkPushStatus() {
+  if (!('Notification' in window)) {
+    document.getElementById('push-status').textContent = 'Não suportado neste browser';
+    return;
+  }
+  const p = Notification.permission;
+  document.getElementById('push-status').textContent =
+    p === 'granted' ? '✅ Ativadas' :
+    p === 'denied' ? '❌ Bloqueadas (altere nas config. do browser)' :
+    'Clique para ativar';
+}
+
+async function requestPushPermission() {
+  if (!('Notification' in window)) return toast('Push não suportado', 'error');
+  const p = await Notification.requestPermission();
+  checkPushStatus();
+  if (p === 'granted') toast('Push notifications ativadas!', 'success');
+  else toast('Permissão negada', 'error');
+}
+
+function sendPush(title, body) {
+  if (Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '/favicon.ico' });
+  }
+}
+
+// ============================================
+// REVIEWS
+// ============================================
+function openReview(vendedorId, vendedorNome, pedidoId) {
+  reviewData = { vendedorId, pedidoId };
+  selectedStar = 0;
+  document.getElementById('review-vendedor-nome').textContent = vendedorNome;
+  document.getElementById('review-comment').value = '';
+  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+  closeModal('adDetailModal');
+  openModal('reviewModal');
+}
+
+function setStar(n) {
+  selectedStar = n;
+  document.querySelectorAll('.star-btn').forEach((b, i) => b.classList.toggle('active', i < n));
+}
+
+async function submitReview() {
+  if (!selectedStar) return toast('Selecione uma nota', 'error');
+  const { error } = await sb.from('reviews').insert({
+    pedido_id: reviewData.pedidoId || 'manual',
+    avaliador_id: currentUser.id,
+    avaliado_id: reviewData.vendedorId,
+    nota: selectedStar,
+    comentario: document.getElementById('review-comment').value.trim() || null
+  });
+  if (error) return toast('Erro ao avaliar (você já avaliou?)', 'error');
+  closeModal('reviewModal');
+  toast('Avaliação enviada!', 'success');
+}
+
+async function loadReviews() {
+  const { data } = await sb.from('reviews').select('*, avaliador:profiles(nome)').eq('avaliado_id', currentUser.id).order('created_at', { ascending: false });
+  document.getElementById('reviews-loading').style.display = 'none';
+  if (!data || !data.length) { document.getElementById('reviews-empty').style.display = 'block'; return; }
+
+  const avg = (data.reduce((s,r)=>s+r.nota,0)/data.length).toFixed(1);
+  document.getElementById('reviews-list').innerHTML = `
+    <div style="text-align:center;padding:12px 0 20px;border-bottom:1px solid var(--border);margin-bottom:12px">
+      <div style="font-family:var(--font-display);font-size:48px;font-weight:800;color:var(--brand)">${avg}</div>
+      <div style="color:var(--warning);font-size:22px">${'⭐'.repeat(Math.round(avg))}</div>
+      <div style="color:var(--text3);font-size:12px">${data.length} avaliação(ões)</div>
+    </div>
+  ` + data.map(r => `
+    <div class="review-item">
+      <div class="review-header">
+        <div class="avatar avatar-sm">${(r.avaliador?.nome||'?')[0].toUpperCase()}</div>
+        <div>
+          <div style="font-size:13px;font-weight:600">${esc(r.avaliador?.nome||'—')}</div>
+          <div class="review-stars">${'⭐'.repeat(r.nota)}</div>
+        </div>
+      </div>
+      ${r.comentario ? `<div class="review-text">${esc(r.comentario)}</div>` : ''}
+      <div class="review-date">${timeAgo(r.created_at)}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// REALTIME
+// ============================================
+function subscribeRealtime() {
+  const notifSub = sb.channel('user-notifications')
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'notifications',
+      filter: `user_id=eq.${currentUser.id}`
+    }, payload => {
+      loadNotifBadge();
+      sendPush(payload.new.titulo, payload.new.corpo || '');
+      if (currentPage === 'notifications') loadNotifications();
+    }).subscribe();
+  realtimeSubs.push(notifSub);
+}
+
+function unsubscribeRealtime() {
+  realtimeSubs.forEach(s => s.unsubscribe?.());
+  realtimeSubs = [];
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+const pageActions = {
+  home: () => loadAds(),
+  chat: () => { loadChats(); if (window.innerWidth <= 768) { document.getElementById('chatList').classList.add('mobile-show'); document.getElementById('chatWindow').classList.remove('mobile-show'); } },
+  forum: () => loadForum(),
+  notifications: () => loadNotifications(),
+  meus: () => loadMeusAnuncios(),
+  settings: () => loadNotifToggles(),
+  profile: () => { updateSidebarUser(); loadReviews(); }
+};
+
+const pageTitles = { home:'Anúncios', chat:'Conversas', forum:'Fórum', notifications:'Notificações', meus:'Meus Anúncios', settings:'Configurações', profile:'Meu Perfil' };
+
+function navigate(page) {
+  currentPage = page;
+  // Pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(`page-${page}`);
+  if (el) el.classList.add('active');
+
+  // Nav active states
+  document.querySelectorAll('.nav-item[id^="nav-"]').forEach(n => n.classList.remove('active'));
+  const navEl = document.getElementById(`nav-${page}`);
+  if (navEl) navEl.classList.add('active');
+
+  document.querySelectorAll('.bnav-item[id^="bnav-"]').forEach(n => n.classList.remove('active'));
+  const bnavEl = document.getElementById(`bnav-${page}`);
+  if (bnavEl) bnavEl.classList.add('active');
+
+  // Title
+  document.getElementById('topbar-title').textContent = pageTitles[page] || '';
+
+  // Load data
+  if (pageActions[page]) pageActions[page]();
+
+  closeSidebar();
+}
+
+// ============================================
+// SIDEBAR MOBILE
+// ============================================
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('sidebarOverlay').classList.add('active');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+// ============================================
+// MODALS
+// ============================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ============================================
+// UTILS
+// ============================================
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'agora';
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  return `${Math.floor(h / 24)}d`;
+}
+
+function toast(msg, type = '') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+</script>
+</body>
+</html>
